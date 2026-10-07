@@ -10,6 +10,9 @@ export type Contact = {
   status: string
   notes: string[]
   photo: string | null
+  photoFit?: 'cover' | 'contain'
+  photoPosition?: string
+  photoScale?: number
 }
 
 export type DashboardStat = {

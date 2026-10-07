@@ -27,7 +27,7 @@
       "company": "Solstice",
       "role": "Operaciones",
       "status": "Activo",
-      "photo": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop stop-color='%238b5cf6'/><stop offset='1' stop-color='%236d28d9'/></linearGradient></defs><rect width='128' height='128' rx='28' fill='url(%23g)'/><circle cx='64' cy='52' r='24' fill='rgba(255,255,255,0.9)'/><path d='M26 106c7-21 27-32 38-32s31 11 38 32' fill='rgba(255,255,255,0.9)'/></svg>",
+      "photo": "/images/ana-perez.avif",
       "notes": ["Llamada de seguimiento el 5 de octubre"]
     },
     {
@@ -38,7 +38,7 @@
       "company": "North Peak",
       "role": "Compras",
       "status": "En seguimiento",
-      "photo": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop stop-color='%230ea5e9'/><stop offset='1' stop-color='%23059669'/></linearGradient></defs><rect width='128' height='128' rx='28' fill='url(%23g)'/><circle cx='64' cy='50' r='23' fill='rgba(255,255,255,0.92)'/><path d='M27 106c8-20 26-31 37-31s29 11 37 31' fill='rgba(255,255,255,0.92)'/></svg>",
+      "photo": "/images/marco-ruiz.jfif",
       "notes": ["Pedir actualización de propuesta para el viernes"]
     },
     {
@@ -60,8 +60,19 @@
       "company": "Canopy Labs",
       "role": "Ventas",
       "status": "Activo",
-      "photo": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop stop-color='%23f97316'/><stop offset='1' stop-color='%23fb7185'/></linearGradient></defs><rect width='128' height='128' rx='28' fill='url(%23g)'/><circle cx='64' cy='49' r='22' fill='rgba(255,255,255,0.9)'/><path d='M28 106c8-20 26-31 36-31s29 11 36 31' fill='rgba(255,255,255,0.9)'/></svg>",
+      "photo": "/images/Diego-mora.jpg",
       "notes": ["Enviar resumen de la demo antes del cierre de mes"]
+    },
+    {
+      "id": "amada-villar",
+      "name": "Amada Villar",
+      "email": "AVillar@gmail.com",
+      "phone": "321 953 1866",
+      "company": "Nova Partners",
+      "role": "Relaciones comerciales",
+      "status": "En seguimiento",
+      "photo": null,
+      "notes": ["Pendiente de confirmar una llamada de introduccion esta semana"]
     }
   ]
 }
