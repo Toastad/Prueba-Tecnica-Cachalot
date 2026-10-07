@@ -1336,6 +1336,7 @@ body {
 
   .content {
     padding: 0.72rem;
+    padding-bottom: calc(5.7rem + env(safe-area-inset-bottom));
     gap: 0.68rem;
   }
 
@@ -1404,6 +1405,7 @@ body {
 @media (max-width: 560px) {
   .content {
     padding: 0.5rem 0.42rem;
+    padding-bottom: calc(5.35rem + env(safe-area-inset-bottom));
     gap: 0.42rem;
   }
 
@@ -1548,6 +1550,7 @@ body {
   .settings-item {
     grid-template-columns: 1fr;
     align-items: start;
+    row-gap: 0.4rem;
   }
 
   .settings-item-meta {
@@ -1558,6 +1561,10 @@ body {
 
   .settings-note {
     text-align: left;
+  }
+
+  [data-compact='true'] .settings-item {
+    padding: 0.62rem 0.66rem;
   }
 
   .profile-card {
