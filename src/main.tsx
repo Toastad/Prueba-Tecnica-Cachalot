@@ -12,28 +12,31 @@ import SettingsPage from './pages/SettingsPage.tsx'
 import TransactionsPage from './pages/TransactionsPage.tsx'
 import './styles/app.css'
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <AppLayout />,
-    children: [
-      { index: true, element: <HomePage /> },
-      { path: 'contacts', element: <ContactsPage /> },
-      { path: 'transactions', element: <TransactionsPage /> },
-      { path: 'accounts', element: <AccountsPage /> },
-      { path: 'reports', element: <ReportsPage /> },
-      { path: 'settings', element: <SettingsPage /> },
-    ],
-  },
-  {
-    path: '/app',
-    element: <App />,
-  },
-  {
-    path: '*',
-    element: <Navigate to="/" replace />,
-  },
-])
+const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <AppLayout />,
+      children: [
+        { index: true, element: <HomePage /> },
+        { path: 'contacts', element: <ContactsPage /> },
+        { path: 'transactions', element: <TransactionsPage /> },
+        { path: 'accounts', element: <AccountsPage /> },
+        { path: 'reports', element: <ReportsPage /> },
+        { path: 'settings', element: <SettingsPage /> },
+      ],
+    },
+    {
+      path: '/app',
+      element: <App />,
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ],
+  { basename: import.meta.env.BASE_URL },
+)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
