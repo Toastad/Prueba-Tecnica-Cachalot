@@ -87,6 +87,7 @@ function formatPercent(value: number, total: number) {
 function App() {
   const [contactList, setContactList] = useState(initialContacts)
   const [query, setQuery] = useState('')
+  const [hoveredActivityIndex, setHoveredActivityIndex] = useState<number | null>(null)
   const [hoveredPipelineIndex, setHoveredPipelineIndex] = useState<number | null>(null)
   const [selectedContactId, setSelectedContactId] = useState(
     initialContacts[0]?.id ?? '',
@@ -123,6 +124,8 @@ function App() {
   const maxEmails = Math.max(...weeklyActivity.map((point) => point.emails))
   const maxMeetings = Math.max(...weeklyActivity.map((point) => point.meetings))
   const pipelineTotal = pipelineStages.reduce((sum, stage) => sum + stage.value, 0)
+  const activeActivityIndex = hoveredActivityIndex ?? 0
+  const activeActivity = weeklyActivity[activeActivityIndex] ?? weeklyActivity[0]
   const activePipelineIndex = hoveredPipelineIndex ?? 1
   const activePipelineStage =
     pipelineStages[activePipelineIndex] ?? pipelineStages[0] ?? { stage: 'Sin datos', value: 0 }
@@ -303,10 +306,24 @@ function App() {
             <div className="bar-chart" aria-label="Gráfico de actividad semanal">
               {weeklyActivity.map((point, index) => (
                 <article
-                  className="bar-chart-day"
+                  className={
+                    index === hoveredActivityIndex ? 'bar-chart-day is-active' : 'bar-chart-day'
+                  }
                   key={point.day}
                   style={{ '--activity-accent': activityColors[index % activityColors.length] } as CSSProperties}
+                  onMouseEnter={() => setHoveredActivityIndex(index)}
+                  onMouseLeave={() => setHoveredActivityIndex(null)}
+                  onFocus={() => setHoveredActivityIndex(index)}
+                  onBlur={() => setHoveredActivityIndex(null)}
+                  tabIndex={0}
                 >
+                  <div className="chart-popout">
+                    <strong>{point.day}</strong>
+                    <span>{point.calls + point.emails + point.meetings} interacciones</span>
+                    <small>
+                      {point.calls} llamadas · {point.emails} correos · {point.meetings} reuniones
+                    </small>
+                  </div>
                   <div className="bar-column" aria-hidden="true">
                     <span
                       className="bar bar-calls"
@@ -334,6 +351,20 @@ function App() {
               <li><span className="legend-swatch emails" /> Correos</li>
               <li><span className="legend-swatch meetings" /> Reuniones</li>
             </ul>
+
+            {activeActivity ? (
+              <div className="chart-popout summary" aria-live="polite">
+                <strong>{activeActivity.day}</strong>
+                <span>
+                  {activeActivity.calls + activeActivity.emails + activeActivity.meetings}{' '}
+                  interacciones
+                </span>
+                <small>
+                  {activeActivity.calls} llamadas, {activeActivity.emails} correos y{' '}
+                  {activeActivity.meetings} reuniones
+                </small>
+              </div>
+            ) : null}
           </section>
 
           <section className="panel chart-panel" id="pipeline" aria-labelledby="pipeline-heading">
@@ -384,6 +415,19 @@ function App() {
                   <span>{activePipelineStage.stage}</span>
                   <small>{activePipelineStage.value} oportunidades</small>
                 </div>
+              </div>
+
+              <div
+                className={
+                  hoveredPipelineIndex !== null
+                    ? 'pipeline-popout is-visible'
+                    : 'pipeline-popout'
+                }
+                aria-live="polite"
+              >
+                <strong>{activePipelineStage.stage}</strong>
+                <span>{formatPercent(activePipelineStage.value, pipelineTotal)} del pipeline</span>
+                <small>{activePipelineStage.value} oportunidades activas</small>
               </div>
 
               <ul className="pipeline-list">
