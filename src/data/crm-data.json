@@ -1,0 +1,78 @@
+{
+  "stats": [
+    { "label": "Clientes activos", "value": "14", "detail": "+3 este mes" },
+    { "label": "Seguimientos", "value": "28", "detail": "8 hoy" },
+    { "label": "Tasa de respuesta", "value": "87%", "detail": "Promedio semanal" },
+    { "label": "Valor del pipeline", "value": "$128k", "detail": "Meta: $150k" }
+  ],
+  "activity": [
+    { "day": "Lun", "calls": 8, "emails": 5, "meetings": 2 },
+    { "day": "Mar", "calls": 5, "emails": 7, "meetings": 3 },
+    { "day": "Mié", "calls": 10, "emails": 6, "meetings": 4 },
+    { "day": "Jue", "calls": 6, "emails": 8, "meetings": 2 },
+    { "day": "Vie", "calls": 9, "emails": 4, "meetings": 5 }
+  ],
+  "pipeline": [
+    { "stage": "Prospecto", "value": 18 },
+    { "stage": "Demo", "value": 31 },
+    { "stage": "Propuesta", "value": 24 },
+    { "stage": "Cierre", "value": 27 }
+  ],
+  "contacts": [
+    {
+      "id": "ana-perez",
+      "name": "Ana Pérez",
+      "email": "ana.perez@solstice.io",
+      "phone": "+34 612 345 890",
+      "company": "Solstice",
+      "role": "Operaciones",
+      "status": "Activo",
+      "photo": "/images/ana-perez.avif",
+      "notes": ["Llamada de seguimiento el 5 de octubre"]
+    },
+    {
+      "id": "marco-ruiz",
+      "name": "Marco Ruiz",
+      "email": "marco@northpeak.mx",
+      "phone": "+52 55 9211 4008",
+      "company": "North Peak",
+      "role": "Compras",
+      "status": "En seguimiento",
+      "photo": "/images/marco-ruiz.jfif",
+      "notes": ["Pedir actualización de propuesta para el viernes"]
+    },
+    {
+      "id": "luisa-ferrer",
+      "name": "Luisa Ferrer",
+      "email": "luisa@atelier.studio",
+      "phone": "+57 320 884 1122",
+      "company": "Atelier Studio",
+      "role": "Dirección",
+      "status": "Nuevo",
+      "photo": null,
+      "notes": []
+    },
+    {
+      "id": "diego-mora",
+      "name": "Diego Mora",
+      "email": "diego.mora@canopylabs.com",
+      "phone": "+1 305 555 0148",
+      "company": "Canopy Labs",
+      "role": "Ventas",
+      "status": "Activo",
+      "photo": "/images/Diego-mora.jpg",
+      "notes": ["Enviar resumen de la demo antes del cierre de mes"]
+    },
+    {
+      "id": "amada-villar",
+      "name": "Amada Villar",
+      "email": "AVillar@gmail.com",
+      "phone": "321 953 1866",
+      "company": "Nova Partners",
+      "role": "Relaciones comerciales",
+      "status": "En seguimiento",
+      "photo": null,
+      "notes": ["Pendiente de confirmar una llamada de introduccion esta semana"]
+    }
+  ]
+}
