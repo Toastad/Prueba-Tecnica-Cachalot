@@ -1,4 +1,4 @@
-import { type CSSProperties, type FormEvent, useState } from 'react'
+import { type CSSProperties, type FormEvent, type MouseEvent, useState } from 'react'
 import {
   contacts as initialContacts,
   dashboardStats,
@@ -87,6 +87,7 @@ function formatPercent(value: number, total: number) {
 function App() {
   const [contactList, setContactList] = useState(initialContacts)
   const [query, setQuery] = useState('')
+  const [hoveredPipelineIndex, setHoveredPipelineIndex] = useState<number | null>(null)
   const [selectedContactId, setSelectedContactId] = useState(
     initialContacts[0]?.id ?? '',
   )
@@ -122,20 +123,54 @@ function App() {
   const maxEmails = Math.max(...weeklyActivity.map((point) => point.emails))
   const maxMeetings = Math.max(...weeklyActivity.map((point) => point.meetings))
   const pipelineTotal = pipelineStages.reduce((sum, stage) => sum + stage.value, 0)
-  const donutGradient = pipelineStages
-    .map((stage, index) => {
-      const start =
-        (pipelineStages
-          .slice(0, index)
-          .reduce((sum, previous) => sum + previous.value, 0) /
-          pipelineTotal) *
-        100
-      const end = ((start + stage.value / pipelineTotal * 100) * 3.6).toFixed(2)
-      const startAngle = (start * 3.6).toFixed(2)
+  const activePipelineIndex = hoveredPipelineIndex ?? 1
+  const activePipelineStage =
+    pipelineStages[activePipelineIndex] ?? pipelineStages[0] ?? { stage: 'Sin datos', value: 0 }
 
-      return `${pipelineColors[index % pipelineColors.length]} ${startAngle}deg ${end}deg`
+  const donutSegments = pipelineStages.map((stage, index) => {
+    const startPortion =
+      pipelineStages
+        .slice(0, index)
+        .reduce((sum, previous) => sum + previous.value, 0) / pipelineTotal
+    const portion = stage.value / pipelineTotal
+
+    return {
+      stage,
+      index,
+      startPortion,
+      portion,
+      color: pipelineColors[index % pipelineColors.length],
+    }
+  })
+
+  function handleDonutHover(event: MouseEvent<HTMLDivElement>) {
+    const targetRect = event.currentTarget.getBoundingClientRect()
+    const centerX = targetRect.left + targetRect.width / 2
+    const centerY = targetRect.top + targetRect.height / 2
+    const dx = event.clientX - centerX
+    const dy = event.clientY - centerY
+    const distance = Math.sqrt(dx * dx + dy * dy)
+    const radius = Math.min(targetRect.width, targetRect.height) / 2
+    const innerRadius = radius * 0.5
+    const outerRadius = radius * 0.84
+
+    if (distance < innerRadius || distance > outerRadius || pipelineTotal === 0) {
+      setHoveredPipelineIndex(null)
+      return
+    }
+
+    const angleDegrees = (Math.atan2(dy, dx) * 180) / Math.PI
+    const normalizedDegrees = (angleDegrees + 90 + 360) % 360
+    const normalizedPortion = normalizedDegrees / 360
+
+    const segmentIndex = donutSegments.findIndex((segment) => {
+      const segmentEnd = segment.startPortion + segment.portion
+
+      return normalizedPortion >= segment.startPortion && normalizedPortion < segmentEnd
     })
-    .join(', ')
+
+    setHoveredPipelineIndex(segmentIndex >= 0 ? segmentIndex : null)
+  }
 
   function handleCreateContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -315,11 +350,39 @@ function App() {
                 className="donut-chart"
                 aria-label="Gráfico circular del pipeline"
                 role="img"
-                style={{ backgroundImage: `conic-gradient(${donutGradient})` }}
+                onMouseMove={handleDonutHover}
+                onMouseLeave={() => setHoveredPipelineIndex(null)}
               >
+                <svg viewBox="0 0 120 120" className="donut-chart-svg" aria-hidden="true">
+                  <circle cx="60" cy="60" r="40" className="donut-track" />
+                  {donutSegments.map((segment) => {
+                    const circumference = 2 * Math.PI * 40
+
+                    return (
+                      <circle
+                        key={segment.stage.stage}
+                        cx="60"
+                        cy="60"
+                        r="40"
+                        className={
+                          segment.index === activePipelineIndex
+                            ? 'donut-segment is-active'
+                            : 'donut-segment'
+                        }
+                        style={{
+                          stroke: segment.color,
+                          strokeDasharray: `${segment.portion * circumference} ${circumference}`,
+                          strokeDashoffset: `${-segment.startPortion * circumference}`,
+                        }}
+                        transform="rotate(-90 60 60)"
+                      />
+                    )
+                  })}
+                </svg>
                 <div>
-                  <strong>{formatPercent(pipelineStages[1]?.value ?? 0, pipelineTotal)}</strong>
-                  <span>Demo</span>
+                  <strong>{formatPercent(activePipelineStage.value, pipelineTotal)}</strong>
+                  <span>{activePipelineStage.stage}</span>
+                  <small>{activePipelineStage.value} oportunidades</small>
                 </div>
               </div>
 
@@ -328,6 +391,11 @@ function App() {
                   <li
                     key={stage.stage}
                     style={{ '--stage-accent': pipelineColors[index % pipelineColors.length] } as CSSProperties}
+                    onMouseEnter={() => setHoveredPipelineIndex(index)}
+                    onFocus={() => setHoveredPipelineIndex(index)}
+                    onMouseLeave={() => setHoveredPipelineIndex(null)}
+                    onBlur={() => setHoveredPipelineIndex(null)}
+                    tabIndex={0}
                   >
                     <span className={`legend-swatch stage-${index}`} aria-hidden="true" />
                     <div>
