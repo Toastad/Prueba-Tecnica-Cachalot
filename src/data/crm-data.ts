@@ -9,6 +9,7 @@ export type Contact = {
   role: string
   status: string
   notes: string[]
+  photo: string | null
 }
 
 export type DashboardStat = {

@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react'
+import { type CSSProperties, type FormEvent, useState } from 'react'
 import {
   contacts as initialContacts,
   dashboardStats,
@@ -7,15 +7,74 @@ import {
 } from './data/crm-data'
 import './App.css'
 
-const statusColors = ['#f97316', '#0ea5e9', '#8b5cf6', '#14b8a6']
-const navigationItems = [
-  { label: 'Dashboard', href: '#dashboard', active: true },
-  { label: 'Contacts', href: '#contacts', active: false },
-  { label: 'Transactions', href: '#activity', active: false },
-  { label: 'Accounts', href: '#pipeline', active: false },
-  { label: 'Reports', href: '#contacts', active: false },
-  { label: 'Settings', href: '#contacts', active: false },
+type NavigationIconName = 'dashboard' | 'contacts' | 'trend' | 'stack' | 'chart' | 'gear'
+
+type NavigationItem = {
+  label: string
+  href: string
+  active: boolean
+  icon: NavigationIconName
+}
+
+const navigationItems: NavigationItem[] = [
+  { label: 'Dashboard', href: '#dashboard', active: true, icon: 'dashboard' },
+  { label: 'Contacts', href: '#contacts', active: false, icon: 'contacts' },
+  { label: 'Transactions', href: '#activity', active: false, icon: 'trend' },
+  { label: 'Accounts', href: '#pipeline', active: false, icon: 'stack' },
+  { label: 'Reports', href: '#contacts', active: false, icon: 'chart' },
+  { label: 'Settings', href: '#contacts', active: false, icon: 'gear' },
 ]
+
+const pipelineColors = ['#8b5cf6', '#0ea5e9', '#14b8a6', '#f97316']
+const activityColors = ['#8b5cf6', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899']
+
+function NavigationIcon({ name }: { name: NavigationIconName }) {
+  switch (name) {
+    case 'dashboard':
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 12h6V4H4zm0 8h6v-6H4zm10 0h6V11h-6zm0-16v6h6V4z" />
+        </svg>
+      )
+    case 'contacts':
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 7a5 5 0 1 1 10 0 5 5 0 0 1-10 0Zm-3 13c0-4 3.6-7 8-7s8 3 8 7" />
+        </svg>
+      )
+    case 'trend':
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 17 10 11l4 4 6-8" />
+          <path d="M14 7h6v6" />
+        </svg>
+      )
+    case 'stack':
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3 3 8l9 5 9-5-9-5Z" />
+          <path d="m3 12 9 5 9-5" />
+          <path d="m3 16 9 5 9-5" />
+        </svg>
+      )
+    case 'chart':
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 19h16" />
+          <path d="M7 15v-5" />
+          <path d="M12 15V7" />
+          <path d="M17 15v-3" />
+        </svg>
+      )
+    case 'gear':
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+          <path d="m19 12 2-1-1-3-2 .5a7 7 0 0 0-1.4-1.4L17 4l-3-1-1 2a7 7 0 0 0-2 0l-1-2-3 1 .4 2.1A7 7 0 0 0 5 8.5L3 8l-1 3 2 1a7 7 0 0 0 0 2l-2 1 1 3 2-.5a7 7 0 0 0 1.4 1.4L7 20l3 1 1-2a7 7 0 0 0 2 0l1 2 3-1-.4-2.1A7 7 0 0 0 18 15.5l2 .5 1-3-2-1a7 7 0 0 0 0-2Z" />
+        </svg>
+      )
+  }
+}
 
 function formatPercent(value: number, total: number) {
   if (total === 0) {
@@ -74,7 +133,7 @@ function App() {
       const end = ((start + stage.value / pipelineTotal * 100) * 3.6).toFixed(2)
       const startAngle = (start * 3.6).toFixed(2)
 
-      return `${statusColors[index % statusColors.length]} ${startAngle}deg ${end}deg`
+      return `${pipelineColors[index % pipelineColors.length]} ${startAngle}deg ${end}deg`
     })
     .join(', ')
 
@@ -106,6 +165,7 @@ function App() {
       company: formValues.company.trim() || 'Sin empresa',
       role: 'Nuevo contacto',
       status: 'Nuevo',
+      photo: null,
       notes: [],
     }
 
@@ -146,6 +206,9 @@ function App() {
               aria-current={item.active ? 'page' : undefined}
             >
               <span className="nav-dot" aria-hidden="true" />
+              <span className="nav-icon" aria-hidden="true">
+                <NavigationIcon name={item.icon} />
+              </span>
               {item.label}
             </a>
           ))}
@@ -165,7 +228,12 @@ function App() {
             <h1>Overview</h1>
           </div>
 
-          <div className="topbar-chip">Search for something</div>
+          <button type="button" className="topbar-chip">
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="chip-icon">
+              <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm5.5-1.5L20 20" />
+            </svg>
+            <span>Search for something</span>
+          </button>
         </header>
 
         <section className="hero-card">
@@ -198,8 +266,12 @@ function App() {
             </div>
 
             <div className="bar-chart" aria-label="Gráfico de actividad semanal">
-              {weeklyActivity.map((point) => (
-                <article className="bar-chart-day" key={point.day}>
+              {weeklyActivity.map((point, index) => (
+                <article
+                  className="bar-chart-day"
+                  key={point.day}
+                  style={{ '--activity-accent': activityColors[index % activityColors.length] } as CSSProperties}
+                >
                   <div className="bar-column" aria-hidden="true">
                     <span
                       className="bar bar-calls"
@@ -253,7 +325,10 @@ function App() {
 
               <ul className="pipeline-list">
                 {pipelineStages.map((stage, index) => (
-                  <li key={stage.stage}>
+                  <li
+                    key={stage.stage}
+                    style={{ '--stage-accent': pipelineColors[index % pipelineColors.length] } as CSSProperties}
+                  >
                     <span className={`legend-swatch stage-${index}`} aria-hidden="true" />
                     <div>
                       <strong>{stage.stage}</strong>
@@ -386,6 +461,7 @@ function App() {
               <ul className="contact-list" aria-label="Lista de contactos">
                 {visibleContacts.map((contact) => {
                   const isSelected = contact.id === selectedContact?.id
+                  const hasPhoto = Boolean(contact.photo)
 
                   return (
                     <li key={contact.id}>
@@ -396,11 +472,17 @@ function App() {
                         aria-pressed={isSelected}
                       >
                         <span className="contact-avatar" aria-hidden="true">
-                          {contact.name
-                            .split(' ')
-                            .map((part) => part[0])
-                            .slice(0, 2)
-                            .join('')}
+                          {hasPhoto ? (
+                            <img src={contact.photo ?? undefined} alt="" />
+                          ) : (
+                            <span className="avatar-fallback">
+                              {contact.name
+                                .split(' ')
+                                .map((part) => part[0])
+                                .slice(0, 2)
+                                .join('')}
+                            </span>
+                          )}
                         </span>
 
                         <span className="contact-card-copy">
