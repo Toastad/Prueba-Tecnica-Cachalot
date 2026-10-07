@@ -1,11 +1,28 @@
 import { type FormEvent, useState } from 'react'
-import { contacts } from './data/contacts'
+import {
+  contacts as initialContacts,
+  dashboardStats,
+  pipelineStages,
+  weeklyActivity,
+} from './data/crm-data'
 import './App.css'
 
+const statusColors = ['#f97316', '#0ea5e9', '#8b5cf6', '#14b8a6']
+
+function formatPercent(value: number, total: number) {
+  if (total === 0) {
+    return '0%'
+  }
+
+  return `${Math.round((value / total) * 100)}%`
+}
+
 function App() {
-  const [contactList, setContactList] = useState(contacts)
+  const [contactList, setContactList] = useState(initialContacts)
   const [query, setQuery] = useState('')
-  const [selectedContactId, setSelectedContactId] = useState(contactList[0]?.id ?? '')
+  const [selectedContactId, setSelectedContactId] = useState(
+    initialContacts[0]?.id ?? '',
+  )
   const [formValues, setFormValues] = useState({
     name: '',
     email: '',
@@ -17,9 +34,8 @@ function App() {
     email: '',
   })
 
+  const normalizedQuery = query.trim().toLowerCase()
   const visibleContacts = contactList.filter((contact) => {
-    const normalizedQuery = query.trim().toLowerCase()
-
     if (!normalizedQuery) {
       return true
     }
@@ -34,6 +50,25 @@ function App() {
     visibleContacts.find((contact) => contact.id === selectedContactId) ??
     visibleContacts[0] ??
     contactList[0]
+
+  const maxCalls = Math.max(...weeklyActivity.map((point) => point.calls))
+  const maxEmails = Math.max(...weeklyActivity.map((point) => point.emails))
+  const maxMeetings = Math.max(...weeklyActivity.map((point) => point.meetings))
+  const pipelineTotal = pipelineStages.reduce((sum, stage) => sum + stage.value, 0)
+  const donutGradient = pipelineStages
+    .map((stage, index) => {
+      const start =
+        (pipelineStages
+          .slice(0, index)
+          .reduce((sum, previous) => sum + previous.value, 0) /
+          pipelineTotal) *
+        100
+      const end = ((start + stage.value / pipelineTotal * 100) * 3.6).toFixed(2)
+      const startAngle = (start * 3.6).toFixed(2)
+
+      return `${statusColors[index % statusColors.length]} ${startAngle}deg ${end}deg`
+    })
+    .join(', ')
 
   function handleCreateContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -82,32 +117,111 @@ function App() {
   }
 
   return (
-    <main className="page-shell">
+    <main className="app-shell">
       <section className="hero-card">
-        <div>
-          <p className="eyebrow">CRM de contactos</p>
-          <h1>Lista inicial de clientes importados</h1>
+        <div className="hero-copy">
+          <p className="eyebrow">CRM de clientes</p>
+          <h1>Panel ligero para seguir contactos, actividad y oportunidades</h1>
           <p className="lead">
-            Esta primera entrega muestra contactos simulados, búsqueda por nombre
-            o empresa y una vista de detalle para revisar la información básica.
+            Una interfaz tipo app, pensada para celular y escritorio, con datos
+            simulados, gráficos simples y acciones rápidas sobre cada cliente.
           </p>
         </div>
 
-        <div className="hero-stats" aria-label="Resumen del panel">
-          <div>
-            <strong>{contacts.length}</strong>
-            <span>contactos cargados</span>
-          </div>
-          <div>
-            <strong>{visibleContacts.length}</strong>
-            <span>coincidencias visibles</span>
-          </div>
+        <div className="hero-metrics" aria-label="Resumen del panel">
+          {dashboardStats.map((stat) => (
+            <article className="metric-card" key={stat.label}>
+              <span>{stat.label}</span>
+              <strong>{stat.value}</strong>
+              <small>{stat.detail}</small>
+            </article>
+          ))}
         </div>
+      </section>
+
+      <section className="dashboard-grid">
+        <section className="panel chart-panel" aria-labelledby="activity-heading">
+          <div className="panel-heading">
+            <div>
+              <p className="panel-kicker">Actividad semanal</p>
+              <h2 id="activity-heading">Llamadas, correos y reuniones</h2>
+            </div>
+            <span className="panel-subtitle">Resumen de los últimos 5 días</span>
+          </div>
+
+          <div className="bar-chart" aria-label="Gráfico de actividad semanal">
+            {weeklyActivity.map((point) => (
+              <article className="bar-chart-day" key={point.day}>
+                <div className="bar-column" aria-hidden="true">
+                  <span
+                    className="bar bar-calls"
+                    style={{ height: `${Math.max((point.calls / maxCalls) * 100, 12)}%` }}
+                  />
+                  <span
+                    className="bar bar-emails"
+                    style={{ height: `${Math.max((point.emails / maxEmails) * 100, 12)}%` }}
+                  />
+                  <span
+                    className="bar bar-meetings"
+                    style={{ height: `${Math.max((point.meetings / maxMeetings) * 100, 12)}%` }}
+                  />
+                </div>
+                <div className="bar-chart-labels">
+                  <strong>{point.day}</strong>
+                  <span>{point.calls + point.emails + point.meetings} interacciones</span>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <ul className="chart-legend" aria-label="Leyenda del gráfico de actividad">
+            <li><span className="legend-swatch calls" /> Llamadas</li>
+            <li><span className="legend-swatch emails" /> Correos</li>
+            <li><span className="legend-swatch meetings" /> Reuniones</li>
+          </ul>
+        </section>
+
+        <section className="panel chart-panel" aria-labelledby="pipeline-heading">
+          <div className="panel-heading">
+            <div>
+              <p className="panel-kicker">Pipeline</p>
+              <h2 id="pipeline-heading">Distribución de oportunidades</h2>
+            </div>
+            <span className="panel-subtitle">{pipelineTotal} oportunidades</span>
+          </div>
+
+          <div className="pipeline-card">
+            <div
+              className="donut-chart"
+              aria-label="Gráfico circular del pipeline"
+              role="img"
+              style={{ backgroundImage: `conic-gradient(${donutGradient})` }}
+            >
+              <div>
+                <strong>{formatPercent(pipelineStages[1]?.value ?? 0, pipelineTotal)}</strong>
+                <span>Demo</span>
+              </div>
+            </div>
+
+            <ul className="pipeline-list">
+              {pipelineStages.map((stage, index) => (
+                <li key={stage.stage}>
+                  <span className={`legend-swatch stage-${index}`} aria-hidden="true" />
+                  <div>
+                    <strong>{stage.stage}</strong>
+                    <small>{stage.value} oportunidades</small>
+                  </div>
+                  <strong>{formatPercent(stage.value, pipelineTotal)}</strong>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       </section>
 
       <section className="workspace">
         <aside className="panel contact-list-panel" aria-labelledby="contacts-heading">
-          <div className="panel-header">
+          <div className="panel-heading stacked-mobile">
             <div>
               <p className="panel-kicker">Directorio</p>
               <h2 id="contacts-heading">Contactos</h2>
@@ -131,7 +245,7 @@ function App() {
                 <p className="panel-kicker">Nuevo contacto</p>
                 <h3>Agregar cliente</h3>
               </div>
-              <p>Se guardará solo en esta sesión usando datos simulados.</p>
+              <p>Se guarda en memoria local y se selecciona automáticamente.</p>
             </div>
 
             <div className="form-grid">
@@ -259,7 +373,7 @@ function App() {
         <section className="panel detail-panel" aria-labelledby="contact-detail-heading">
           {selectedContact ? (
             <>
-              <div className="panel-header detail-header">
+              <div className="panel-heading stacked-mobile">
                 <div>
                   <p className="panel-kicker">Detalle del contacto</p>
                   <h2 id="contact-detail-heading">{selectedContact.name}</h2>
