@@ -34,6 +34,7 @@ const pageTitleByPath: Record<string, string> = {
 }
 
 export default function AppLayout() {
+  const logoSrc = `${import.meta.env.BASE_URL}logos/Bank.png`
   const location = useLocation()
   const navigate = useNavigate()
   const title = pageTitleByPath[location.pathname] ?? 'Overview'
@@ -95,7 +96,7 @@ export default function AppLayout() {
       <header className="mobile-top-strip" aria-label="Barra superior movil">
         <div className="mobile-brand">
           <span className="brand-mark" aria-hidden="true">
-            <img src="/logos/Bank.png" alt="" className="brand-logo" />
+            <img src={logoSrc} alt="" className="brand-logo" />
           </span>
           <div>
             <span>{title}</span>
@@ -147,7 +148,7 @@ export default function AppLayout() {
         <div className="sidebar-inner">
           <div className="brand-block">
             <div className="brand-mark" aria-hidden="true">
-              <img src="/logos/Bank.png" alt="" className="brand-logo" />
+              <img src={logoSrc} alt="" className="brand-logo" />
             </div>
             <div>
               <span>CRM workspace</span>

@@ -41,8 +41,22 @@ type CrmData = {
 }
 
 const typedCrmData = crmData as CrmData
+const baseUrl = import.meta.env.BASE_URL
+
+function resolveStaticAssetPath(path: string | null): string | null {
+  if (!path || !path.startsWith('/')) {
+    return path
+  }
+
+  return `${baseUrl}${path.slice(1)}`
+}
+
+const normalizedContacts = typedCrmData.contacts.map((contact) => ({
+  ...contact,
+  photo: resolveStaticAssetPath(contact.photo),
+}))
 
 export const dashboardStats = typedCrmData.stats
 export const weeklyActivity = typedCrmData.activity
 export const pipelineStages = typedCrmData.pipeline
-export const contacts = typedCrmData.contacts
+export const contacts = normalizedContacts
