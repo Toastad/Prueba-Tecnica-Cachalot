@@ -1,12 +1,23 @@
-import { useState } from 'react'
+import { type FormEvent, useState } from 'react'
 import { contacts } from './data/contacts'
 import './App.css'
 
 function App() {
+  const [contactList, setContactList] = useState(contacts)
   const [query, setQuery] = useState('')
-  const [selectedContactId, setSelectedContactId] = useState(contacts[0]?.id ?? '')
+  const [selectedContactId, setSelectedContactId] = useState(contactList[0]?.id ?? '')
+  const [formValues, setFormValues] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+  })
+  const [formErrors, setFormErrors] = useState({
+    name: '',
+    email: '',
+  })
 
-  const visibleContacts = contacts.filter((contact) => {
+  const visibleContacts = contactList.filter((contact) => {
     const normalizedQuery = query.trim().toLowerCase()
 
     if (!normalizedQuery) {
@@ -22,7 +33,53 @@ function App() {
   const selectedContact =
     visibleContacts.find((contact) => contact.id === selectedContactId) ??
     visibleContacts[0] ??
-    contacts[0]
+    contactList[0]
+
+  function handleCreateContact(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const nextErrors = {
+      name: formValues.name.trim() ? '' : 'El nombre es obligatorio.',
+      email: '',
+    }
+
+    if (!formValues.email.trim()) {
+      nextErrors.email = 'El correo es obligatorio.'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email.trim())) {
+      nextErrors.email = 'Ingresa un correo con formato válido.'
+    }
+
+    setFormErrors(nextErrors)
+
+    if (nextErrors.name || nextErrors.email) {
+      return
+    }
+
+    const newContact = {
+      id: `contact-${Date.now()}`,
+      name: formValues.name.trim(),
+      email: formValues.email.trim(),
+      phone: formValues.phone.trim() || 'Sin teléfono',
+      company: formValues.company.trim() || 'Sin empresa',
+      role: 'Nuevo contacto',
+      status: 'Nuevo',
+      notes: [],
+    }
+
+    setContactList((currentContacts) => [newContact, ...currentContacts])
+    setSelectedContactId(newContact.id)
+    setQuery('')
+    setFormValues({
+      name: '',
+      email: '',
+      phone: '',
+      company: '',
+    })
+    setFormErrors({
+      name: '',
+      email: '',
+    })
+  }
 
   return (
     <main className="page-shell">
@@ -67,6 +124,96 @@ function App() {
               />
             </label>
           </div>
+
+          <form className="contact-form" onSubmit={handleCreateContact} noValidate>
+            <div className="contact-form-header">
+              <div>
+                <p className="panel-kicker">Nuevo contacto</p>
+                <h3>Agregar cliente</h3>
+              </div>
+              <p>Se guardará solo en esta sesión usando datos simulados.</p>
+            </div>
+
+            <div className="form-grid">
+              <label className="field">
+                <span>Nombre *</span>
+                <input
+                  type="text"
+                  value={formValues.name}
+                  onChange={(event) =>
+                    setFormValues((currentValues) => ({
+                      ...currentValues,
+                      name: event.target.value,
+                    }))
+                  }
+                  aria-invalid={Boolean(formErrors.name)}
+                  aria-describedby={formErrors.name ? 'name-error' : undefined}
+                  placeholder="Ej. Laura Gómez"
+                />
+                {formErrors.name ? (
+                  <small id="name-error" className="field-error">
+                    {formErrors.name}
+                  </small>
+                ) : null}
+              </label>
+
+              <label className="field">
+                <span>Correo *</span>
+                <input
+                  type="email"
+                  value={formValues.email}
+                  onChange={(event) =>
+                    setFormValues((currentValues) => ({
+                      ...currentValues,
+                      email: event.target.value,
+                    }))
+                  }
+                  aria-invalid={Boolean(formErrors.email)}
+                  aria-describedby={formErrors.email ? 'email-error' : undefined}
+                  placeholder="Ej. laura@empresa.com"
+                />
+                {formErrors.email ? (
+                  <small id="email-error" className="field-error">
+                    {formErrors.email}
+                  </small>
+                ) : null}
+              </label>
+
+              <label className="field">
+                <span>Teléfono</span>
+                <input
+                  type="tel"
+                  value={formValues.phone}
+                  onChange={(event) =>
+                    setFormValues((currentValues) => ({
+                      ...currentValues,
+                      phone: event.target.value,
+                    }))
+                  }
+                  placeholder="Ej. +34 600 123 456"
+                />
+              </label>
+
+              <label className="field">
+                <span>Empresa</span>
+                <input
+                  type="text"
+                  value={formValues.company}
+                  onChange={(event) =>
+                    setFormValues((currentValues) => ({
+                      ...currentValues,
+                      company: event.target.value,
+                    }))
+                  }
+                  placeholder="Ej. Norte Digital"
+                />
+              </label>
+            </div>
+
+            <button type="submit" className="submit-button">
+              Guardar contacto
+            </button>
+          </form>
 
           {visibleContacts.length === 0 ? (
             <div className="empty-state" role="status">
