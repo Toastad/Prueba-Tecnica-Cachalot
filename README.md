@@ -260,7 +260,7 @@ https://github.com/Toastad/Prueba-Tecnica-Cachalot
 
 ### Pull Request
 
-Agregar aquí el enlace al Pull Request abierto hacia `main`.
+https://github.com/Toastad/Prueba-Tecnica-Cachalot/pull/1
 
 ---
 
